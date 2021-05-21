@@ -11,14 +11,16 @@
 #include <unordered_map>
 
 using namespace std;
-#define THREADS_PER_BLOCK 256
+#define THREADS_PER_BLOCK 512
 #define PARALEL_THREAD_COUNT 32
-#define GPU_MULTIPLIER 10
+#define GPU_MULTIPLIER 8
 #define PARALEL_CPU 28
-
+#define CHUNK_SIZE_OUR 64
+#define OUR_GPU_COUNT 4
 // #define VIRTUAL_THREAD_COUNT 68
 // 4  10 40
 // 28 1  28
+
 
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
@@ -285,25 +287,30 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
   double start_cpu, end_cpu;
   start_cpu = omp_get_wtime();
 
+  int totalChunck = (nov + CHUNK_SIZE_OUR -1) /CHUNK_SIZE_OUR;
+  int currentChunk = 0; //mask accesed atomicly
+
+
 
   #pragma omp parallel num_threads(PARALEL_THREAD_COUNT)
   {
 
+
     int threadId=omp_get_thread_num ();
     // cout<< threadId<<endl;
+    //
+    // int virtual_thread_count  = GPU_MULTIPLIER *4 + PARALEL_CPU;
+    // int novForThread = (nov+virtual_thread_count-1)/virtual_thread_count;
 
-    int virtual_thread_count  = GPU_MULTIPLIER *4 + PARALEL_CPU;
-    int novForThread = (nov+virtual_thread_count-1)/virtual_thread_count;
 
 
-
-    if(threadId <=3)
+    if(threadId <=(OUR_GPU_COUNT-1))
     {
-      int novStart = GPU_MULTIPLIER * novForThread * threadId;
-      int novEnd   = GPU_MULTIPLIER * novForThread * (threadId+1);
-      if (novEnd > nov) novEnd = nov;
-      int numBlock = (novEnd-novStart + THREADS_PER_BLOCK-1) / THREADS_PER_BLOCK;
-      // printf("nov s %d e %d \n", novStart,novEnd);
+      // int novStart = GPU_MULTIPLIER * novForThread * threadId;
+      // int novEnd   = GPU_MULTIPLIER * novForThread * (threadId+1);
+      // if (novEnd > nov) novEnd = nov;
+      // int numBlock = (novEnd-novStart + THREADS_PER_BLOCK-1) / THREADS_PER_BLOCK;
+      // // printf("nov s %d e %d \n", novStart,novEnd);
 
 
       cudaSetDevice(threadId);
@@ -317,7 +324,7 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
       gpuErrchk(cudaMalloc((void**)&adj_d, (nnz) * sizeof(int)));
       gpuErrchk(cudaMalloc((void**)&xadj_d, (nov + 1) * sizeof(int)));
 
-      gpuErrchk(cudaMalloc((void**)&output_d, (novEnd-novStart) * sizeof(int)));
+      gpuErrchk(cudaMalloc((void**)&output_d, (GPU_MULTIPLIER *CHUNK_SIZE_OUR) * sizeof(int)));
 
       //gpuErrchk(cudaMallocHost((void **)&output_h, (nov) * sizeof(int)));
 
@@ -330,16 +337,48 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
       cudaStream_t stream1;
       cudaStreamCreate ( &stream1) ;
 
-        // printf("threadId entry to kernel %d GPU \n", threadId );
-      if      (n==3)kernel3<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
-      else if (n==4)kernel4<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
-       else if (n==5)kernel5<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
-      //combination<<<numBlocks, threadsPerBlock>>>(adj_d, xadj_d, output_d, n, nov);
-      // printf("threadId exit to kernel %d GPU \n", threadId );
+
+      while(true){
+        int thisChunk;
+
+        #pragma omp critical
+        {
+          thisChunk=currentChunk; //thisChunk is different on everyone.
+          currentChunk+= GPU_MULTIPLIER;
+
+        }
+        if (thisChunk  >= totalChunck) break;
+
+        int novStart   = thisChunk * CHUNK_SIZE_OUR;
+
+        int novEnd =  novStart + GPU_MULTIPLIER * CHUNK_SIZE_OUR;
+
+        // printf("nov s %d e %d \n", novStart,novEnd);
+        if(novEnd>nov) novEnd=nov;
+
+        int numBlock = (novEnd-novStart + THREADS_PER_BLOCK-1) / THREADS_PER_BLOCK;
+
+
+
+
+
+         // printf("threadId entry to kernel %d GPU \n", threadId );
+        if      (n==3)kernel3<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
+        else if (n==4)kernel4<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
+        else if (n==5)kernel5<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
+       //combination<<<numBlocks, threadsPerBlock>>>(adj_d, xadj_d, output_d, n, nov);
+       // printf("threadId exit to kernel %d GPU \n", threadId );
+
+      gpuErrchk(cudaDeviceSynchronize());
+      gpuErrchk(cudaMemcpy(output_h+novStart, output_d, (novEnd-novStart) * sizeof(int), cudaMemcpyDeviceToHost));
+
+      }
+
+
       double end_gpu = omp_get_wtime();
 
 
-      gpuErrchk(cudaDeviceSynchronize());
+
       cudaEventCreate(&stop);
       cudaEventRecord(stop, 0);
       cudaEventSynchronize(stop);
@@ -347,7 +386,6 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
 
       printf("GPU scale took: %f s on gpu  %d \n", elapsedTime/1000, threadId);
 
-      gpuErrchk(cudaMemcpy(output_h+novStart, output_d, (novEnd-novStart) * sizeof(int), cudaMemcpyDeviceToHost));
       cudaFree(adj_d);
       cudaFree(xadj_d);
 
@@ -361,23 +399,43 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
       // int novEnd   = novForThread * (threadId+1);
       // if (novEnd> nov) novEnd = nov;
       // int numBlock = (novEnd-novStart + THREADS_PER_BLOCK-1) / THREADS_PER_BLOCK;
-      int novStart = 4 * GPU_MULTIPLIER*novForThread +  1 * novForThread * (threadId-4);
-      int novEnd   =  novStart + 1*  novForThread ;
-      if (novEnd> nov) novEnd = nov;
+      // int novStart = 4 * GPU_MULTIPLIER*novForThread +  1 * novForThread * (threadId-4);
+      // int novEnd   =  novStart + 1*  novForThread ;
+      // if (novEnd> nov) novEnd = nov;
 
 
       // printf("nov s %d e %d  -cpu \n", novStart,novEnd);
 
-      bool *marked = new bool[nov];
-      memset(marked, false, nov * sizeof(bool)); // bu belki silinebilir
+    double start_thread = omp_get_wtime();
 
-      double start_thread = omp_get_wtime();
-      for(int i = novStart; i < novEnd; i++){
-          int localcount = 0;
-          DFS_sparse(xadj, adj, marked, n - 1, i, i, localcount);
-          output_h[i ] = localcount;
+    while(true){
+      int thisChunk;
+
+      #pragma omp critical
+      {
+        thisChunk=currentChunk; //thisChunk is different on everyone.
+        currentChunk++;
+
+      }
+      if(thisChunk >= totalChunck) break;
+
+      int novStart   = thisChunk * CHUNK_SIZE_OUR;
+      int novEnd =  (thisChunk+1)* CHUNK_SIZE_OUR;
+      if(novEnd>nov) novEnd=nov;
+      // printf("nov s %d e %d  % d\n", novStart,novEnd, threadId);
 
 
+        bool *marked = new bool[nov];
+        memset(marked, false, nov * sizeof(bool)); // bu belki silinebilir
+
+
+        for(int i = novStart; i < novEnd; i++){
+            int localcount = 0;
+            DFS_sparse(xadj, adj, marked, n - 1, i, i, localcount);
+            output_h[i ] = localcount;
+
+
+        }
       }
       double end_thread = omp_get_wtime();
       printf("Took %f secs \n", end_thread -start_thread );
@@ -389,7 +447,7 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
   }
   end_cpu = omp_get_wtime();
 
-   // printf("Took %f secs \n", end_cpu - start_cpu);
+   printf("Took %f secs \n", end_cpu - start_cpu);
   // printArray(output_h,nov);
 }
 
