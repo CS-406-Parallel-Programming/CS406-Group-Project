@@ -12,6 +12,8 @@
 
 using namespace std;
 
+int flag;
+
 void printArray(int *arr, int nov){
     for (int j=0;j<nov;j++)
     {
@@ -24,7 +26,8 @@ void DFS_sparse(int xadj[], int adj[], bool marked[], int n,
 {
     marked[vert] = true;
     int start_index = xadj[vert];
-    int path_length = xadj[vert+1];  
+    int path_length = xadj[vert+1];
+
     if (n == 0){
         marked[vert] = false;
         for(int i = start_index; i < path_length; i++){
@@ -35,22 +38,25 @@ void DFS_sparse(int xadj[], int adj[], bool marked[], int n,
         }
         return;
     }
+
+// if(path_length-start_index <=1) return;
+
     for(int i=start_index; i < path_length; i++){
         if(!marked[adj[i]]){
             DFS_sparse(xadj, adj, marked, n-1, adj[i], start, count);
-        }      
+        }
     }
     marked[vert] = false;
 }
 
-void countCycles_sparse(int *xadj, int *adj, int n,  int nov) 
+void countCycles_sparse(int *xadj, int *adj, int n,  int nov)
 {
     double start, end;
     start = omp_get_wtime();
     int *arr = new int[nov];
 
-    #pragma omp parallel num_threads(16)
-    { 
+    #pragma omp parallel num_threads(8)
+    {
         bool *marked = new bool[nov];
         memset(marked, false, nov * sizeof(bool)); // bu belki silinebilir
 
@@ -62,7 +68,9 @@ void countCycles_sparse(int *xadj, int *adj, int n,  int nov)
         }
     }
     end = omp_get_wtime();
-    printArray(arr, nov);
+
+    if(flag == 0)	printArray(arr, nov);
+    if(flag == 1)	cout << end-start << " -- TOTAL SURE (s).\n";
 }
 
 void  read_mtxbin(string fname, int k){
@@ -118,13 +126,14 @@ void  read_mtxbin(string fname, int k){
     countCycles_sparse(xadj, adj,k,nov);
   //cout<<"CYCLES: --> "<<countCycles_sparse(xadj, adj,k,nov)<<endl;
 
-  /*double end2 = omp_get_wtime();
-  cout << end2-start << " -- TOTAL SURE (s).\n";*/
+  double end2 = omp_get_wtime();
+  //cout << end2-start << " -- TOTAL SURE (s).\n";
 }
 
 int main(int argc, char *argv[]){
     char* fname = argv[1];
     int k = atoi(argv[2]);
+    flag = atoi(argv[3]);
     read_mtxbin(fname,k);
     return 0;
 }

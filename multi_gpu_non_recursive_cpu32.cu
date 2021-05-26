@@ -19,7 +19,7 @@ using namespace std;
 // #define VIRTUAL_THREAD_COUNT 68
 // 4  10 40
 // 28 1  28
-
+int flag;
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
@@ -65,41 +65,6 @@ void printArray(int *arr, int nov){
         cout << j << " " << arr[j] << endl;
     }
 }
-// {
-// // __device__ bool check(int marked[], int round, int val){
-// //   for(int i = 0; i < round; i++){
-// //     if(marked[i] == val){return false;}
-// //   }
-// //   return true;
-// // }
-// //
-// // __device__ void DFS_sparse(int xadj[], int adj[], int marked[], int n,
-// //          int vert, int start, int &count, int round) //vert: bulundugu konum //start: baslangıc noktası
-// // {
-// //     marked[round] = vert;
-// //
-// //     int start_index = xadj[vert];
-// //     int path_length = xadj[vert+1];
-// //
-// //     if (n == 0){
-// //       marked[round] = -1;
-// //         for(int i = start_index; i < path_length; i++){
-// //             if(adj[i] == start){
-// //                 count++;
-// //                 break;
-// //             }
-// //         }
-// //         return;
-// //     }
-// //
-// //     for(int i=start_index; i < path_length; i++){
-// //         if(check(marked, round,adj[i])){
-// //             DFS_sparse(xadj, adj, marked, n-1, adj[i], start, count, round + 1);
-// //         }
-// //     }
-// //     marked[round] = -1;
-// // }
-// }
 
 __global__ void kernel3(int* adj, int* xadj, int* output, int nov, int novStart){
 
@@ -282,8 +247,8 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
 
   int *output_h = new int[nov];
 
-  double start_cpu, end_cpu;
-  start_cpu = omp_get_wtime();
+//  double start_cpu, end_cpu;
+//  start_cpu = omp_get_wtime();
 
 
   #pragma omp parallel num_threads(PARALEL_THREAD_COUNT)
@@ -345,7 +310,7 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
       cudaEventSynchronize(stop);
       cudaEventElapsedTime(&elapsedTime, start, stop);
 
-      printf("GPU scale took: %f s on gpu  %d \n", elapsedTime/1000, threadId);
+      if(flag == 1)	printf("GPU scale took: %f s on gpu  %d \n", elapsedTime/1000, threadId);
 
       gpuErrchk(cudaMemcpy(output_h+novStart, output_d, (novEnd-novStart) * sizeof(int), cudaMemcpyDeviceToHost));
       cudaFree(adj_d);
@@ -380,17 +345,17 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
 
       }
       double end_thread = omp_get_wtime();
-      printf("Took %f secs \n", end_thread -start_thread );
+      if(flag == 1)	printf("Took %f secs \n", end_thread -start_thread );
 
 
     }
 
 
   }
-  end_cpu = omp_get_wtime();
+//  end_cpu = omp_get_wtime();
 
    // printf("Took %f secs \n", end_cpu - start_cpu);
-  // printArray(output_h,nov);
+  if(flag == 0)	printArray(output_h,nov);
 }
 
 
@@ -453,6 +418,7 @@ void  read_mtxbin(string fname, int k){
 int main(int argc, char *argv[]){
     char* fname = argv[1];
     int k = atoi(argv[2]);
+    flag = atoi(argv[3]);
     read_mtxbin(fname,k);
     return 0;
 }

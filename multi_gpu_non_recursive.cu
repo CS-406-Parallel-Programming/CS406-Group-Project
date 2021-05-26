@@ -20,6 +20,7 @@ using namespace std;
 // 4  10 40
 // 28 1  28
 
+int flag;
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
@@ -65,42 +66,7 @@ void printArray(int *arr, int nov){
         cout << j << " " << arr[j] << endl;
     }
 }
-// {
-// // __device__ bool check(int marked[], int round, int val){
-// //   for(int i = 0; i < round; i++){
-// //     if(marked[i] == val){return false;}
-// //   }
-// //   return true;
-// // }
-// //
-// // __device__ void DFS_sparse(int xadj[], int adj[], int marked[], int n,
-// //          int vert, int start, int &count, int round) //vert: bulundugu konum //start: baslangıc noktası
-// // {
-// //     marked[round] = vert;
-// //
-// //     int start_index = xadj[vert];
-// //     int path_length = xadj[vert+1];
-// //
-// //     if (n == 0){
-// //       marked[round] = -1;
-// //         for(int i = start_index; i < path_length; i++){
-// //             if(adj[i] == start){
-// //                 count++;
-// //                 break;
-// //             }
-// //         }
-// //         return;
-// //     }
-// //
-// //     for(int i=start_index; i < path_length; i++){
-// //         if(check(marked, round,adj[i])){
-// //             DFS_sparse(xadj, adj, marked, n-1, adj[i], start, count, round + 1);
-// //         }
-// //     }
-// //     marked[round] = -1;
-// // }
-// }
-
+              
 __global__ void kernel3(int* adj, int* xadj, int* output, int nov, int novStart){
 
   int index = novStart + threadIdx.x + (blockIdx.x * blockDim.x);
@@ -148,27 +114,20 @@ __global__ void kernel3(int* adj, int* xadj, int* output, int nov, int novStart)
 __global__ void kernel4(int* adj, int* xadj, int* output, int nov,int novStart ){
   int index =novStart + threadIdx.x + (blockIdx.x * blockDim.x);
   if(index < nov){
-      //int *marked = new int[n];
-      //memset(marked, -1, n * sizeof(int)); // bu belki silinebilir
       int localcount = 0;
-      // int round = 0;
 
-      // 0-->
       int s0 = xadj[index];
       int e0 = xadj[index+1];
 
       for(int i=s0; i < e0; i++){
-        // 0 --> 1
 
         int neighbour_1 = adj[i];
         int s1  = xadj[neighbour_1];
         int e1  = xadj[neighbour_1+1];
 
         for(int j=s1;j < e1; j++){
-          // 0 --> 1 --> 2
 
           int neighbour_2 =  adj[j];
-          //eliminate 0 == 2
           if (neighbour_2 == index) continue;
           int s2  = xadj[neighbour_2];
           int e2  = xadj[neighbour_2+1];
@@ -282,8 +241,8 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
 
   int *output_h = new int[nov];
 
-  double start_cpu, end_cpu;
-  start_cpu = omp_get_wtime();
+ // double start_cpu, end_cpu;
+ // start_cpu = omp_get_wtime();
 
 
   #pragma omp parallel num_threads(PARALEL_THREAD_COUNT)
@@ -336,7 +295,7 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
        else if (n==5)kernel5<<<numBlock, THREADS_PER_BLOCK,0,stream1>>>(adj_d, xadj_d, output_d, novEnd,novStart);
       //combination<<<numBlocks, threadsPerBlock>>>(adj_d, xadj_d, output_d, n, nov);
       // printf("threadId exit to kernel %d GPU \n", threadId );
-      double end_gpu = omp_get_wtime();
+   //   double end_gpu = omp_get_wtime();
 
 
       gpuErrchk(cudaDeviceSynchronize());
@@ -345,7 +304,7 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
       cudaEventSynchronize(stop);
       cudaEventElapsedTime(&elapsedTime, start, stop);
 
-      printf("GPU scale took: %f s on gpu  %d \n", elapsedTime/1000, threadId);
+      if(flag == 1)	printf("GPU scale took: %f s on gpu  %d \n", elapsedTime/1000, threadId);
 
       gpuErrchk(cudaMemcpy(output_h+novStart, output_d, (novEnd-novStart) * sizeof(int), cudaMemcpyDeviceToHost));
       cudaFree(adj_d);
@@ -387,10 +346,10 @@ void wrapper(int *xadj, int *adj, int n,  int nov, int nnz){
 
 
   }
-  end_cpu = omp_get_wtime();
+//  end_cpu = omp_get_wtime();
 
    // printf("Took %f secs \n", end_cpu - start_cpu);
-  // printArray(output_h,nov);
+  	if(flag == 0)	printArray(output_h,nov);
 }
 
 
@@ -453,6 +412,7 @@ void  read_mtxbin(string fname, int k){
 int main(int argc, char *argv[]){
     char* fname = argv[1];
     int k = atoi(argv[2]);
+    flag = atoi(argv[3]);
     read_mtxbin(fname,k);
     return 0;
 }
