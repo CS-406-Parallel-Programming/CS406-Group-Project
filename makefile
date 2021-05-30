@@ -1,9 +1,9 @@
 all: OMP GPU_Non_Recursive_Implementation Multi_GPU_Non_Recursive_Implementation Multi_GPU_and_CPU_Non_Recursive_Implementation Multi_GPU_and_CPU_NonRecursive_Dynamic_Workqueue
 
-OMP: finale_openmp.cpp
-	g++ -o omp finale_openmp.cpp -O3 -fopenmp 
+OMP: openmp_nonrecursive.cpp
+	g++ -o omp openmp_nonrecursive.cpp -O3 -fopenmp
 
-GPU_Non_Recursive_Implementation: non_recursive.cu 
+GPU_Non_Recursive_Implementation: non_recursive.cu
 	nvcc -o non_recursive_out non_recursive.cu -O3 -Xcompiler -fopenmp -Xcompiler -O3
 
 Multi_GPU_Non_Recursive_Implementation: multi_gpu_non_recursive.cu
@@ -27,23 +27,35 @@ run_time_all_amazon_4: run_time_omp_amz_4 run_time_gpu_nonrec_amz_4 run_time_mul
 
 run_time_all_amazon_5: run_time_omp_amz_5 run_time_gpu_nonrec_amz_5 run_time_multigpu_non_rec_amz_5 run_time_multigpu_and_cpu_non_rec_amz_5 run_time_multigpu_and_cpu_non_rec_dynamic_amz_5
 
+run_all_dblp_3: run_omp_dblp_3 run_gpu_nonrec_dblp_3 run_multigpu_non_rec_dblp_3 run_multigpu_and_cpu_non_rec_dblp_3 run_multigpu_and_cpu_non_rec_dynamic_dblp_3
+
+run_all_dblp_4: run_omp_dblp_4 run_gpu_nonrec_dblp_4 run_multigpu_non_rec_dblp_4 run_multigpu_and_cpu_non_rec_dblp_4 run_multigpu_and_cpu_non_rec_dynamic_dblp_4
+
+run_all_dblp_5: run_omp_dblp_5 run_gpu_nonrec_dblp_5 run_multigpu_non_rec_dblp_5 run_multigpu_and_cpu_non_rec_dblp_5 run_multigpu_and_cpu_non_rec_dynamic_dblp_5
+
+run_time_all_dblp_3: run_time_omp_dblp_3 run_time_gpu_nonrec_dblp_3 run_time_multigpu_non_rec_dblp_3 run_time_multigpu_and_cpu_non_rec_dblp_3 run_time_multigpu_and_cpu_non_rec_dynamic_dblp_3
+
+run_time_all_dblp_4: run_time_omp_dblp_4 run_time_gpu_nonrec_dblp_4 run_time_multigpu_non_rec_dblp_4 run_time_multigpu_and_cpu_non_rec_dblp_4 run_time_multigpu_and_cpu_non_rec_dynamic_dblp_4
+
+run_time_all_dblp_5: run_time_omp_dblp_5 run_time_gpu_nonrec_dblp_5 run_time_multigpu_non_rec_dblp_5 run_time_multigpu_and_cpu_non_rec_dblp_5 run_time_multigpu_and_cpu_non_rec_dynamic_dblp_5
+
 run_omp_amz_3: OMP
-	./omp amazon.txt 3 0
+	./omp amazon.txt 3 16 0
 
 run_omp_amz_4: OMP
-	./omp amazon.txt 4 0
+	./omp amazon.txt 4 16 0
 
 run_omp_amz_5: OMP
-	./omp amazon.txt 5 0
+	./omp amazon.txt 5 16 0
 
 run_omp_dblp_3: OMP
-	./omp dblp.txt 3 0
+	./omp dblp.txt 3 16 0
 
 run_omp_dblp_4: OMP
-	./omp dblp.txt 4 0
+	./omp dblp.txt 4 16 0
 
 run_omp_dblp_5: OMP
-	./omp dblp.txt 5 0
+	./omp dblp.txt 5 16 0
 
 run_gpu_nonrec_amz_3: GPU_Non_Recursive_Implementation
 	./non_recursive_out amazon.txt 3 0
@@ -118,22 +130,22 @@ run_multigpu_and_cpu_non_rec_dynamic_dblp_5: Multi_GPU_and_CPU_NonRecursive_Dyna
 	./gpu_and_cpu_dynamic_out dblp.txt 5 0
 
 run_time_omp_amz_3: OMP
-	./omp amazon.txt 3 1
+	./omp amazon.txt 3 16 1
 
 run_time_omp_amz_4: OMP
-	./omp amazon.txt 4 1
+	./omp amazon.txt 4 16 1
 
 run_time_omp_amz_5: OMP
-	./omp amazon.txt 5 1
+	./omp amazon.txt 5 16 1
 
 run_time_omp_dblp_3: OMP
-	./omp dblp.txt 3 1
+	./omp dblp.txt 3 16 1
 
 run_time_omp_dblp_4: OMP
-	./omp dblp.txt 4 1
+	./omp dblp.txt 4 16 1
 
 run_time_omp_dblp_5: OMP
-	./omp dblp.txt 5 1
+	./omp dblp.txt 5 16 1
 
 run_time_gpu_nonrec_amz_3: GPU_Non_Recursive_Implementation
 	./non_recursive_out amazon.txt 3 1
@@ -206,5 +218,3 @@ run_time_multigpu_and_cpu_non_rec_dynamic_dblp_4: Multi_GPU_and_CPU_NonRecursive
 
 run_time_multigpu_and_cpu_non_rec_dynamic_dblp_5: Multi_GPU_and_CPU_NonRecursive_Dynamic_Workqueue
 	./gpu_and_cpu_dynamic_out dblp.txt 5 1
-
-
