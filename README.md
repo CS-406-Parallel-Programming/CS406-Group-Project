@@ -3,3 +3,7 @@
 [Project Report](https://github.com/Efesencan/CS406-Group-Project/blob/master/CS406_Project_Final_Report.pdf)
 
 [Project Presentation](https://github.com/Efesencan/CS406-Group-Project/blob/master/CS_406_Presentation.pdf)
+
+## Group Members
+
+Gökberk Yar, Alper Giray, Efe Şencan, Ahmet Enes Deveci, Zeynep Özge Ergin
