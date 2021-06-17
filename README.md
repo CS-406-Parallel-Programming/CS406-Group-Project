@@ -7,3 +7,24 @@
 ## Group Members
 
 Gökberk Yar, Alper Giray, Efe Şencan, Ahmet Enes Deveci, Zeynep Özge Ergin
+
+## Presentation
+
+<div>
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-01.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-02.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-03.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-04.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-05.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-06.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-07.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-08.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-09.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-10.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-11.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-12.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-13.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-14.png">
+
+ </div>
+  
