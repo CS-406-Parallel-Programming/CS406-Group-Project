@@ -1,37 +1,30 @@
-## Welcome to GitHub Pages
+# CS 406 Project 
 
-You can use the [editor on GitHub](https://github.com/CS-406-Parallel-Programming/CS406-Group-Project/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+[Project Report](https://github.com/Efesencan/CS406-Group-Project/blob/master/CS406_Project_Final_Report.pdf)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[Project Presentation](https://github.com/Efesencan/CS406-Group-Project/blob/master/CS_406_Presentation.pdf)
 
-### Markdown
+## Group Members
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Gökberk Yar, Alper Giray, Efe Şencan, Ahmet Enes Deveci, Zeynep Özge Ergin
 
-```markdown
-Syntax highlighted code block
+## Presentation
 
-# Header 1
-## Header 2
-### Header 3
+<div>
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-01.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-02.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-03.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-04.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-05.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-06.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-07.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-08.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-09.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-10.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-11.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-12.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-13.png">
+  <img src="https://raw.githubusercontent.com/CS-406-Parallel-Programming/CS406-Group-Project/master/images/CS_406_Presentation-14.png">
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/CS-406-Parallel-Programming/CS406-Group-Project/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+ </div>
+  
